@@ -9,9 +9,10 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
-#include <SOIL2/SOIL2.h>
+// #include <SOIL2/SOIL2.h>
 
 #include "Shader.h"
+#include "Texture2D.h"
 
 const GLint WIDTH = 800, HEIGHT = 600;
 float mixValue = 0.0f;
@@ -55,14 +56,20 @@ int main()
 
     // SHADER PART
 
-    Shader firstShader("../../src/shader/vertex/vertex.vs", "../../src/shader/fragment/fragment.fs");
-
+    Shader firstShader("../../src/shader/vertex/vertex.vs", "../../src/shader/fragment/fragment_texture.fs");
+    Texture2D crateTex("../../res/textures/container.jpg");
+    Texture2D::SetParameter(GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+    Texture2D::SetParameter(GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    Texture2D otherTex("../../res/textures/5039.jpg");
+    Texture2D::SetParameter(GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+    Texture2D::SetParameter(GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    
     GLfloat triangle[] = 
     {
-        -0.5f, 0.5f, 0.0f, 1.0f, 0.0f, 0.0f, // TOP LEFT
-        -0.5f, -0.5f, 0.0f, 0.0f, 1.0f, 0.0f, // BOTTOM LEFT
-        0.5f, -0.5f, 0.0f, 0.0f, 0.0f, 1.0f, // BOTTOM RIGHT
-        0.5f, 0.5f, 0.0f, 0.5f, 0.5f, 0.5f// TOP RIGHT
+        -0.5f, 0.5f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 1.0f, // TOP LEFT
+        -0.5f, -0.5f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, // BOTTOM LEFT
+        0.5f, -0.5f, 0.0f, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f, // BOTTOM RIGHT
+        0.5f, 0.5f, 0.0f, 0.5f, 0.5f, 0.5f, 1.0f, 1.0f // TOP RIGHT
     };
 
     GLuint indices[] =
@@ -86,13 +93,19 @@ int main()
     glBufferData(GL_ARRAY_BUFFER, sizeof(triangle), triangle, GL_STATIC_DRAW);
 
     glEnableVertexAttribArray(0);
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(GL_FLOAT), (void*)0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(GL_FLOAT), (void*)0);
     glEnableVertexAttribArray(1);
-    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(GL_FLOAT), (void*)(3 * sizeof(GL_FLOAT)));
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(GL_FLOAT), (void*)(3 * sizeof(GL_FLOAT)));
+    glEnableVertexAttribArray(2);
+    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(GL_FLOAT), (void*)(6 * sizeof(GL_FLOAT)));
 
     glBindVertexArray(0);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+    glBindTexture(GL_TEXTURE_2D, 0);
+
+    firstShader.Use();
+    firstShader.setInt("tex", 0);
 
     while(!glfwWindowShouldClose(window))
     {
@@ -103,6 +116,7 @@ int main()
 
         firstShader.Use();
         glBindVertexArray(VAO);
+        crateTex.Bind(GL_TEXTURE0);
         glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 
         glfwSwapBuffers(window);
