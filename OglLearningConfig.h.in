@@ -1,0 +1,3 @@
+#define OglLearning_VERSION_MAJOR @OglLearning_VERSION_MAJOR@
+#define OglLearning_VERSION_MINOR @OglLearning_VERSION_MINOR@
+#define OglLearning_VERSION_PATCH @OglLearning_VERSION_PATCH@

@@ -1,0 +1,13 @@
+cmake_minimum_required (VERSION 3.10)
+
+project(OglLearning VERSION 0.1.0)
+
+configure_file(OglLearningConfig.h.in OglLearningConfig.h)
+
+include(${CMAKE_BINARY_DIR}/conanbuildinfo.cmake)
+conan_basic_setup()
+
+add_executable(Prog1 src/prog1.cpp)
+
+target_include_directories(Prog1 PUBLIC "${PROJECT_BINARY_DIR}")
+target_link_libraries(Prog1 ${CONAN_LIBS})
