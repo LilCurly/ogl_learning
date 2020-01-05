@@ -17,6 +17,28 @@
 const GLint WIDTH = 800, HEIGHT = 600;
 float mixValue = 0.0f;
 
+void processInput(GLFWwindow* window)
+{
+    if(glfwGetKey(window, GLFW_KEY_ESCAPE))
+    {
+        glfwSetWindowShouldClose(window, GLFW_TRUE);
+    }
+    if(glfwGetKey(window, GLFW_KEY_UP))
+    {
+        if(mixValue < 1.0f)
+        {
+            mixValue += 0.01f;
+        }
+    }
+    if(glfwGetKey(window, GLFW_KEY_DOWN))
+    {
+        if(mixValue > 0.0f)
+        {
+            mixValue -= 0.01f;
+        }
+    }
+}
+
 int main()
 {
     glfwInit();
@@ -105,18 +127,23 @@ int main()
     glBindTexture(GL_TEXTURE_2D, 0);
 
     firstShader.Use();
-    firstShader.setInt("tex", 0);
+    firstShader.setInt("firstTex", 0);
+    firstShader.setInt("secondTex", 1);
 
     while(!glfwWindowShouldClose(window))
     {
         glfwPollEvents();
-
+        processInput(window);
+        
         glClearColor(0.3f, 0.4f, 0.4f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
 
+        firstShader.setFloat("mixParameter", mixValue);
+        
         firstShader.Use();
         glBindVertexArray(VAO);
         crateTex.Bind(GL_TEXTURE0);
+        otherTex.Bind(GL_TEXTURE1);
         glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 
         glfwSwapBuffers(window);
