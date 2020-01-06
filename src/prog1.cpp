@@ -183,9 +183,14 @@ int main()
         glClear(GL_COLOR_BUFFER_BIT);
 
         firstShader.setFloat("mixParameter", mixValue);
-        
+
         firstShader.Use();
         glBindVertexArray(VAO);
+        GLfloat scalingValue = abs(sin(glfwGetTime()));
+        glm::mat4 matrix = glm::mat4(1);
+        matrix = glm::rotate(matrix, (float) glfwGetTime(), glm::vec3(0.0, 0.0, 1.0));
+        matrix = glm::scale(matrix, glm::vec3(scalingValue, scalingValue, scalingValue));
+        firstShader.setMatrix("transformationMatrix", glm::value_ptr(matrix));
         crateTex.Bind(GL_TEXTURE0);
         otherTex.Bind(GL_TEXTURE1);
         glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);

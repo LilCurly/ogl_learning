@@ -7,9 +7,11 @@ layout(location=2) in vec2 tex_vert_coord;
 out vec2 tex_frag_coord;
 out vec3 color_f;
 
+uniform mat4 transformationMatrix;
+
 void main()
 {
-    gl_Position = vec4(position, 1.0);
+    gl_Position = transformationMatrix * vec4(position, 1.0);
     color_f = color_s;
     tex_frag_coord = tex_vert_coord;
 }
