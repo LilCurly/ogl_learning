@@ -3,6 +3,7 @@ glfw/3.3@bincrafters/stable
 glew/2.1.0@bincrafters/stable
 glm/0.9.9.6
 soil2/1.11@bincrafters/stable
+boost/1.71.0
 
 [generators]
 cmake

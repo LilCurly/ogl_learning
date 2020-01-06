@@ -1,3 +1,13 @@
+#if defined(_WIN32)
+  #include <windows.h>
+#elif defined(__linux__)
+  #include <sstream>
+  #include <unistd.h>
+#elif defined(__APPLE__)
+  #include <mach-o/dyld.h>
+#endif
+
+#include <vector>
 #include <iostream>
 
 #define GLEW_STATIC
@@ -9,13 +19,47 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
-// #include <SOIL2/SOIL2.h>
+#include <boost/filesystem.hpp>
 
 #include "Shader.h"
 #include "Texture2D.h"
 
 const GLint WIDTH = 800, HEIGHT = 600;
 float mixValue = 0.0f;
+
+boost::filesystem::path find_executable()
+{
+  unsigned int bufferSize = 512;
+  std::vector<char> buffer(bufferSize + 1);
+
+#if defined(_WIN32)
+  ::GetModuleFileName(NULL, &buffer[0], bufferSize);
+
+#elif defined(__linux__)
+  int pid = getpid();
+
+  std::ostringstream oss;
+  oss << "/proc/" << pid << "/exe";
+  std::string link = oss.str();
+
+  int count = readlink(link.c_str(), &buffer[0], bufferSize);
+  if(count == -1) throw std::runtime_error("Could not read symbolic link");
+  buffer[count] = '\0';
+
+#elif defined(__APPLE__)
+  if(_NSGetExecutablePath(&buffer[0], &bufferSize))
+  {
+    buffer.resize(bufferSize);
+    _NSGetExecutablePath(&buffer[0], &bufferSize);
+  }
+
+#else
+  #error Cannot yet find the executable on this platform
+#endif
+
+  std::string s = &buffer[0];
+  return s;
+}
 
 void processInput(GLFWwindow* window)
 {
@@ -27,14 +71,14 @@ void processInput(GLFWwindow* window)
     {
         if(mixValue < 1.0f)
         {
-            mixValue += 0.01f;
+            mixValue += 0.001f;
         }
     }
     if(glfwGetKey(window, GLFW_KEY_DOWN))
     {
         if(mixValue > 0.0f)
         {
-            mixValue -= 0.01f;
+            mixValue -= 0.001f;
         }
     }
 }
@@ -77,12 +121,12 @@ int main()
     glViewport(0, 0, w_width, w_height);
 
     // SHADER PART
-
-    Shader firstShader("../../src/shader/vertex/vertex.vs", "../../src/shader/fragment/fragment_texture.fs");
-    Texture2D crateTex("../../res/textures/container.jpg");
+    
+    Shader firstShader(find_executable().parent_path().append("../../src/shader/vertex/vertex.vs").c_str(), find_executable().parent_path().append("../../src/shader/fragment/fragment_texture.fs").c_str());
+    Texture2D crateTex(find_executable().parent_path().append("../../res/textures/container.jpg").c_str());
     Texture2D::SetParameter(GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
     Texture2D::SetParameter(GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    Texture2D otherTex("../../res/textures/5039.jpg");
+    Texture2D otherTex(find_executable().parent_path().append("../../res/textures/5039.jpg").c_str());
     Texture2D::SetParameter(GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
     Texture2D::SetParameter(GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     
