@@ -124,10 +124,10 @@ int main()
     
     Shader firstShader(find_executable().parent_path().append("../../src/shader/vertex/vertex.vs").c_str(), find_executable().parent_path().append("../../src/shader/fragment/fragment_texture.fs").c_str());
     Texture2D crateTex(find_executable().parent_path().append("../../res/textures/container.jpg").c_str());
-    Texture2D::SetParameter(GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+    Texture2D::SetParameter(GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_NEAREST);
     Texture2D::SetParameter(GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     Texture2D otherTex(find_executable().parent_path().append("../../res/textures/5039.jpg").c_str());
-    Texture2D::SetParameter(GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+    Texture2D::SetParameter(GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_NEAREST);
     Texture2D::SetParameter(GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     
     GLfloat triangle[] = 
@@ -188,7 +188,7 @@ int main()
         glBindVertexArray(VAO);
         GLfloat scalingValue = abs(sin(glfwGetTime()));
         glm::mat4 matrix = glm::mat4(1);
-        matrix = glm::rotate(matrix, (float) glfwGetTime(), glm::vec3(0.0, 0.0, 1.0));
+        matrix = glm::rotate(matrix, (float) glfwGetTime(), glm::vec3(1.0, 1.0, 0.0));
         matrix = glm::scale(matrix, glm::vec3(scalingValue, scalingValue, scalingValue));
         firstShader.setMatrix("transformationMatrix", glm::value_ptr(matrix));
         crateTex.Bind(GL_TEXTURE0);
