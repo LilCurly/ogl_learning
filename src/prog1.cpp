@@ -33,7 +33,17 @@ boost::filesystem::path find_executable()
   std::vector<char> buffer(bufferSize + 1);
 
 #if defined(_WIN32)
-  ::GetModuleFileName(NULL, &buffer[0], bufferSize);
+  std::vector<wchar_t> pathBuf; 
+  DWORD copied = 0;
+  do {
+      pathBuf.resize(pathBuf.size()+MAX_PATH);
+      copied = GetModuleFileNameW(0, &pathBuf.at(0), pathBuf.size());
+  } while( copied >= pathBuf.size() );
+
+  pathBuf.resize(copied);
+
+  buffer.assign((wchar_t*) &pathBuf.front(), (wchar_t*) (&pathBuf.back() + 1));
+
 
 #elif defined(__linux__)
   int pid = getpid();
@@ -121,12 +131,12 @@ int main()
     glViewport(0, 0, w_width, w_height);
 
     // SHADER PART
-    
-    Shader firstShader(find_executable().parent_path().append("../../src/shader/vertex/vertex.vs").c_str(), find_executable().parent_path().append("../../src/shader/fragment/fragment_texture.fs").c_str());
-    Texture2D crateTex(find_executable().parent_path().append("../../res/textures/container.jpg").c_str());
+
+    Shader firstShader(find_executable().parent_path().append("../../src/shader/vertex/vertex.vs").string().c_str(), find_executable().parent_path().append("../../src/shader/fragment/fragment_texture.fs").string().c_str());
+    Texture2D crateTex(find_executable().parent_path().append("../../res/textures/container.jpg").string().c_str());
     Texture2D::SetParameter(GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_NEAREST);
     Texture2D::SetParameter(GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    Texture2D otherTex(find_executable().parent_path().append("../../res/textures/5039.jpg").c_str());
+    Texture2D otherTex(find_executable().parent_path().append("../../res/textures/5039.jpg").string().c_str());
     Texture2D::SetParameter(GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_NEAREST);
     Texture2D::SetParameter(GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     
