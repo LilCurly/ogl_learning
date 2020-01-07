@@ -37,7 +37,17 @@ boost::filesystem::path find_executable()
   std::vector<char> buffer(bufferSize + 1);
 
 #if defined(_WIN32)
-  ::GetModuleFileName(NULL, &buffer[0], bufferSize);
+  std::vector<wchar_t> pathBuf; 
+  DWORD copied = 0;
+  do {
+      pathBuf.resize(pathBuf.size()+MAX_PATH);
+      copied = GetModuleFileNameW(0, &pathBuf.at(0), pathBuf.size());
+  } while( copied >= pathBuf.size() );
+
+  pathBuf.resize(copied);
+
+  buffer.assign((wchar_t*) &pathBuf.front(), (wchar_t*) (&pathBuf.back() + 1));
+
 
 #elif defined(__linux__)
   int pid = getpid();
@@ -149,11 +159,11 @@ int main()
 
     // SHADER PART
     
-    Shader firstShader(find_executable().parent_path().append("../../src/shader/vertex/vertex.vs").c_str(), find_executable().parent_path().append("../../src/shader/fragment/fragment.fs").c_str());
-    Texture2D crateTex(find_executable().parent_path().append("../../res/textures/container.jpg").c_str());
+    Shader firstShader(find_executable().parent_path().append("../../src/shader/vertex/vertex.vs").string().c_str(), find_executable().parent_path().append("../../src/shader/fragment/fragment.fs").string().c_str());
+    Texture2D crateTex(find_executable().parent_path().append("../../res/textures/container.jpg").string().c_str());
     Texture2D::SetParameter(GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_NEAREST);
     Texture2D::SetParameter(GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    Texture2D otherTex(find_executable().parent_path().append("../../res/textures/5039.jpg").c_str());
+    Texture2D otherTex(find_executable().parent_path().append("../../res/textures/5039.jpg").string().c_str());
     Texture2D::SetParameter(GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_NEAREST);
     Texture2D::SetParameter(GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     
@@ -165,16 +175,13 @@ int main()
     };
 
     sierpinskiTriangle(Point(0.0f, 0.5f, 0.0f), Point(-0.5f, -0.5f, 0.0f), Point(0.5f, -0.5f, 0.0f), triangle, 8);
-
-    GLuint indices[triangle.size()/8];
+    int arr_size = triangle.size() / 8;
+    std::vector <GLuint> indices;
 
     for(int i = 0; i < triangle.size() / 8; i++) 
     {
-        indices[i] = i;
+        indices.push_back(i);
     };
-
-    GLfloat triangleArray[triangle.size()];
-    std::copy(triangle.begin(), triangle.end(), triangleArray);
 
     GLuint VBO, VAO, EBO;
 
@@ -185,10 +192,10 @@ int main()
     glBindVertexArray(VAO);
 
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices) + (sizeof(GLuint) * indices.size()), &indices[0], GL_STATIC_DRAW);
 
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(triangleArray), triangleArray, GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(triangle) + (sizeof(GLfloat) * triangle.size()), &triangle[0], GL_STATIC_DRAW);
 
     glEnableVertexAttribArray(0);
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(GL_FLOAT), (void*)0);
