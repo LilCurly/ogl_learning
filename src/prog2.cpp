@@ -164,7 +164,7 @@ int main()
         0.5f, -0.5f, 0.0f, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f, // BOTTOM RIGHT
     };
 
-    sierpinskiTriangle(Point(0.0f, 0.5f, 0.0f), Point(-0.5f, -0.5f, 0.0f), Point(0.5f, -0.5f, 0.0f), triangle, 6);
+    sierpinskiTriangle(Point(0.0f, 0.5f, 0.0f), Point(-0.5f, -0.5f, 0.0f), Point(0.5f, -0.5f, 0.0f), triangle, 8);
 
     GLuint indices[triangle.size()/8];
 
