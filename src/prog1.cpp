@@ -27,6 +27,10 @@
 const GLint WIDTH = 800, HEIGHT = 600;
 float mixValue = 0.0f;
 
+glm::vec3 cameraPos(0.0f, 0.0f, 3.0f);
+glm::vec3 cameraFront(0.0f, 0.0f, -1.0f);
+glm::vec3 cameraUp(0.0f, 1.0f, 0.0f);
+
 boost::filesystem::path find_executable()
 {
   unsigned int bufferSize = 512;
@@ -246,9 +250,13 @@ int main()
         glBindVertexArray(VAO); 
         crateTex.Bind(GL_TEXTURE0);
         otherTex.Bind(GL_TEXTURE1);
-
+        const float radius = 15.0f;
+        float camX = sin(glfwGetTime()) * radius;
+        float camZ = cos(glfwGetTime()) * radius;
         glm::mat4 view = glm::mat4(1.0f);
-        view = glm::translate(view, glm::vec3(0.0f, 0.0f, -3.0f));
+        view = glm::lookAt(cameraPos,
+                            cameraPos + cameraFront,
+                            cameraUp);
         firstShader.setMatrix("view", glm::value_ptr(view));
         glm::mat4 projection;
         projection = glm::perspective(glm::radians(45.0f), (float) WIDTH/ (float) HEIGHT, 0.1f, 100.0f);
