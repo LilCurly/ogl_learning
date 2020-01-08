@@ -159,7 +159,7 @@ int main()
 
     // SHADER PART
     
-    Shader firstShader(find_executable().parent_path().append("../../src/shader/vertex/vertex.vs").string().c_str(), find_executable().parent_path().append("../../src/shader/fragment/fragment.fs").string().c_str());
+    Shader firstShader(find_executable().parent_path().append("../../src/shader/vertex/prog2.vertex.vs").string().c_str(), find_executable().parent_path().append("../../src/shader/fragment/fragment.fs").string().c_str());
     Texture2D crateTex(find_executable().parent_path().append("../../res/textures/container.jpg").string().c_str());
     Texture2D::SetParameter(GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_NEAREST);
     Texture2D::SetParameter(GL_TEXTURE_MAG_FILTER, GL_LINEAR);
