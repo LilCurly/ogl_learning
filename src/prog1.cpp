@@ -25,11 +25,23 @@
 #include "Texture2D.h"
 
 const GLint WIDTH = 800, HEIGHT = 600;
+
 float mixValue = 0.0f;
 
+// Mouse posisition
+bool firstMouse = true;
+float lastMouseX = WIDTH / 2, lastMouseY = HEIGHT / 2;
+
+// Camera configuration
 glm::vec3 cameraPos(0.0f, 0.0f, 3.0f);
 glm::vec3 cameraFront(0.0f, 0.0f, -1.0f);
 glm::vec3 cameraUp(0.0f, 1.0f, 0.0f);
+
+float yaw = 0.0f, pitch = 0.0f;
+
+// Delta Time
+float deltatime = 0.0f;
+float lastframe = 0.0f;
 
 boost::filesystem::path find_executable()
 {
@@ -75,25 +87,83 @@ boost::filesystem::path find_executable()
   return s;
 }
 
+void mouseCallback(GLFWwindow* window, double mouseX, double mouseY)
+{
+    if(firstMouse)
+    {
+        yaw = -90.0f;
+        lastMouseY = mouseY;
+        lastMouseX = mouseX;
+        firstMouse = false;
+    }
+
+    float offsetX = mouseX - lastMouseX;
+    float offsetY = lastMouseY - mouseY;
+
+    lastMouseX = mouseX;
+    lastMouseY = mouseY;
+
+    float sensitivity = 0.05f;
+
+    offsetX *= sensitivity;
+    offsetY *= sensitivity;
+
+    yaw += offsetX;
+    pitch += offsetY;
+
+    if (pitch > 89.0f)
+    {
+        pitch = 89.0f;
+    }
+    if (pitch < -89.0f)
+    {
+        pitch = -89.0f;
+    }
+
+    glm::vec3 directions;
+    directions.x = cos(glm::radians(yaw)) * cos(glm::radians(pitch));
+    directions.y = sin(glm::radians(pitch));
+    directions.z = sin(glm::radians(yaw)) * cos(glm::radians(pitch));
+    cameraFront = glm::normalize(directions);
+}
+
 void processInput(GLFWwindow* window)
 {
-    if(glfwGetKey(window, GLFW_KEY_ESCAPE))
+    float yaw = -90.0f;
+    float speed = 2.5 * deltatime;
+    if(glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
     {
         glfwSetWindowShouldClose(window, GLFW_TRUE);
     }
-    if(glfwGetKey(window, GLFW_KEY_UP))
+    if(glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS)
     {
         if(mixValue < 1.0f)
         {
             mixValue += 0.001f;
         }
     }
-    if(glfwGetKey(window, GLFW_KEY_DOWN))
+    if(glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS)
     {
         if(mixValue > 0.0f)
         {
             mixValue -= 0.001f;
         }
+    }
+    if(glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
+    {
+        cameraPos += cameraFront * speed;
+    }
+    if(glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
+    {
+        cameraPos -= cameraFront * speed;
+    }
+    if(glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
+    {
+        cameraPos -= glm::normalize(glm::cross(cameraFront, cameraUp)) * speed;
+    }
+    if(glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
+    {
+        cameraPos += glm::normalize(glm::cross(cameraFront, cameraUp)) * speed;
     }
 }
 
@@ -121,6 +191,9 @@ int main()
     glfwGetFramebufferSize(window, &w_width, &w_height);
 
     glfwMakeContextCurrent(window);
+
+    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+    glfwSetCursorPosCallback(window, mouseCallback);
 
     glewExperimental = GL_TRUE;
 
@@ -240,6 +313,10 @@ int main()
     {
         glfwPollEvents();
         processInput(window);
+
+        float currentframe = glfwGetTime();
+        deltatime = currentframe - lastframe;
+        lastframe = currentframe;
         
         glClearColor(0.3f, 0.4f, 0.4f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
