@@ -12,6 +12,8 @@ add_executable(Prog1 src/prog1.cpp)
 target_include_directories(Prog1 PUBLIC "${CONAN_INCLUDE_DIRS}")
 target_link_libraries(Prog1 ${CONAN_LIBS})
 
+target_compile_features(Prog1 PUBLIC cxx_std_11)
+
 add_executable(Prog2 src/prog2.cpp)
 
 target_include_directories(Prog2 PUBLIC "${CONAN_INCLUDE_DIRS}")

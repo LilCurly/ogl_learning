@@ -23,25 +23,22 @@
 
 #include "Shader.h"
 #include "Texture2D.h"
+#include "Camera.h"
 
 const GLint WIDTH = 800, HEIGHT = 600;
 
 float mixValue = 0.0f;
 
-// Mouse posisition
+Camera cam;
 bool firstMouse = true;
-float lastMouseX = WIDTH / 2, lastMouseY = HEIGHT / 2;
-
-// Camera configuration
-glm::vec3 cameraPos(0.0f, 0.0f, 3.0f);
-glm::vec3 cameraFront(0.0f, 0.0f, -1.0f);
-glm::vec3 cameraUp(0.0f, 1.0f, 0.0f);
-
-float yaw = 0.0f, pitch = 0.0f;
+float lastX, lastY;
 
 // Delta Time
 float deltatime = 0.0f;
 float lastframe = 0.0f;
+
+// Projection
+glm::mat4 projection;
 
 boost::filesystem::path find_executable()
 {
@@ -87,44 +84,29 @@ boost::filesystem::path find_executable()
   return s;
 }
 
-void mouseCallback(GLFWwindow* window, double mouseX, double mouseY)
+void mouseCallback(GLFWwindow* window, double xpos, double ypos)
 {
-    if(firstMouse)
+    if (firstMouse)
     {
-        yaw = -90.0f;
-        lastMouseY = mouseY;
-        lastMouseX = mouseX;
+        lastX = xpos;
+        lastY = ypos;
         firstMouse = false;
     }
 
-    float offsetX = mouseX - lastMouseX;
-    float offsetY = lastMouseY - mouseY;
+    float xoffset = xpos - lastX;
+    float yoffset = lastY - ypos; // reversed since y-coordinates go from bottom to top
 
-    lastMouseX = mouseX;
-    lastMouseY = mouseY;
+    lastX = xpos;
+    lastY = ypos;
 
-    float sensitivity = 0.05f;
+    cam.ProcessMouseMovement(xoffset, yoffset);
+}
 
-    offsetX *= sensitivity;
-    offsetY *= sensitivity;
+void scrollCallback(GLFWwindow* window, double xoffset, double yoffset)
+{
+    cam.ProcessMouseScroll(yoffset);
 
-    yaw += offsetX;
-    pitch += offsetY;
-
-    if (pitch > 89.0f)
-    {
-        pitch = 89.0f;
-    }
-    if (pitch < -89.0f)
-    {
-        pitch = -89.0f;
-    }
-
-    glm::vec3 directions;
-    directions.x = cos(glm::radians(yaw)) * cos(glm::radians(pitch));
-    directions.y = sin(glm::radians(pitch));
-    directions.z = sin(glm::radians(yaw)) * cos(glm::radians(pitch));
-    cameraFront = glm::normalize(directions);
+    glm::perspective(glm::radians(cam.Zoom), (float) WIDTH/ (float) HEIGHT, 0.1f, 100.0f);
 }
 
 void processInput(GLFWwindow* window)
@@ -151,19 +133,19 @@ void processInput(GLFWwindow* window)
     }
     if(glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
     {
-        cameraPos += cameraFront * speed;
+        cam.ProcessKeyboard(Camera_Movement::FORWARD, deltatime);
     }
     if(glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
     {
-        cameraPos -= cameraFront * speed;
+        cam.ProcessKeyboard(Camera_Movement::BACKWARD, deltatime);
     }
     if(glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
     {
-        cameraPos -= glm::normalize(glm::cross(cameraFront, cameraUp)) * speed;
+        cam.ProcessKeyboard(Camera_Movement::LEFT, deltatime);
     }
     if(glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
     {
-        cameraPos += glm::normalize(glm::cross(cameraFront, cameraUp)) * speed;
+        cam.ProcessKeyboard(Camera_Movement::RIGHT, deltatime);
     }
 }
 
@@ -194,6 +176,7 @@ int main()
 
     glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
     glfwSetCursorPosCallback(window, mouseCallback);
+    glfwSetScrollCallback(window, scrollCallback);
 
     glewExperimental = GL_TRUE;
 
@@ -207,6 +190,8 @@ int main()
 
     glViewport(0, 0, w_width, w_height);
     glEnable(GL_DEPTH_TEST);
+
+    cam = Camera(glm::vec3(0.0f, 0.0f, 3.0f));
 
     // SHADER PART
 
@@ -331,12 +316,9 @@ int main()
         float camX = sin(glfwGetTime()) * radius;
         float camZ = cos(glfwGetTime()) * radius;
         glm::mat4 view = glm::mat4(1.0f);
-        view = glm::lookAt(cameraPos,
-                            cameraPos + cameraFront,
-                            cameraUp);
+        view = cam.GetViewMatrix();
         firstShader.setMatrix("view", glm::value_ptr(view));
-        glm::mat4 projection;
-        projection = glm::perspective(glm::radians(45.0f), (float) WIDTH/ (float) HEIGHT, 0.1f, 100.0f);
+        projection = glm::perspective(glm::radians(cam.Zoom), (float) WIDTH/ (float) HEIGHT, 0.1f, 100.0f);
         firstShader.setMatrix("projection", glm::value_ptr(projection));
 
         for (int i = 0; i < 10; i++) {
