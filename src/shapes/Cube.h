@@ -6,7 +6,7 @@ class Cube
 {
 public:
     glm::vec3 position;
-    std::vector<float> vertices;
+    float csize;
 
     Cube(float posX, float posY, float posZ, float size)
     {
@@ -14,52 +14,52 @@ public:
         position.y = posY;
         position.z = posZ;
 
-        vertices = getVertices(size);
+        csize = size;
     }
     
-    static std::vector<float> getVertices(float size) {
+    std::vector<float> getVertices() {
         std::vector<float> vertices = {
-            -size, -size, -size,  0.0f, 0.0f,
-            size, -size, -size,  1.0f, 0.0f,
-            size,  size, -size,  1.0f, 1.0f,
-            size,  size, -size,  1.0f, 1.0f,
-            -size, size, -size,  0.0f, 1.0f,
-            -size, -size, -size,  0.0f, 0.0f,
+            -csize, -csize, -csize,  0.0f, 0.0f,
+            csize, -csize, -csize,  1.0f, 0.0f,
+            csize,  csize, -csize,  1.0f, 1.0f,
+            csize,  csize, -csize,  1.0f, 1.0f,
+            -csize, csize, -csize,  0.0f, 1.0f,
+            -csize, -csize, -csize,  0.0f, 0.0f,
 
-            -size, -size,  size,  0.0f, 0.0f,
-            size, -size,  size,  1.0f, 0.0f,
-            size,  size,  size,  1.0f, 1.0f,
-            size,  size,  size,  1.0f, 1.0f,
-            -size,  size,  size,  0.0f, 1.0f,
-            -size, -size,  size,  0.0f, 0.0f,
+            -csize, -csize,  csize,  0.0f, 0.0f,
+            csize, -csize,  csize,  1.0f, 0.0f,
+            csize,  csize,  csize,  1.0f, 1.0f,
+            csize,  csize,  csize,  1.0f, 1.0f,
+            -csize,  csize,  csize,  0.0f, 1.0f,
+            -csize, -csize,  csize,  0.0f, 0.0f,
 
-            -size,  size,  size,  1.0f, 0.0f,
-            -size,  size, -size,  1.0f, 1.0f,
-            -size, -size, -size,  0.0f, 1.0f,
-            -size, -size, -size,  0.0f, 1.0f,
-            -size, -size,  size,  0.0f, 0.0f,
-            -size,  size,  size,  1.0f, 0.0f,
+            -csize,  csize,  csize,  1.0f, 0.0f,
+            -csize,  csize, -csize,  1.0f, 1.0f,
+            -csize, -csize, -csize,  0.0f, 1.0f,
+            -csize, -csize, -csize,  0.0f, 1.0f,
+            -csize, -csize,  csize,  0.0f, 0.0f,
+            -csize,  csize,  csize,  1.0f, 0.0f,
 
-            size,  size,  size,  1.0f, 0.0f,
-            size,  size, -size,  1.0f, 1.0f,
-            size, -size, -size,  0.0f, 1.0f,
-            size, -size, -size,  0.0f, 1.0f,
-            size, -size,  size,  0.0f, 0.0f,
-            size,  size,  size,  1.0f, 0.0f,
+            csize,  csize,  csize,  1.0f, 0.0f,
+            csize,  csize, -csize,  1.0f, 1.0f,
+            csize, -csize, -csize,  0.0f, 1.0f,
+            csize, -csize, -csize,  0.0f, 1.0f,
+            csize, -csize,  csize,  0.0f, 0.0f,
+            csize,  csize,  csize,  1.0f, 0.0f,
 
-            -size, -size, -size,  0.0f, 1.0f,
-            size, -size, -size,  1.0f, 1.0f,
-            size, -size,  size,  1.0f, 0.0f,
-            size, -size,  size,  1.0f, 0.0f,
-            -size, -size,  size,  0.0f, 0.0f,
-            -size, -size, -size,  0.0f, 1.0f,
+            -csize, -csize, -csize,  0.0f, 1.0f,
+            csize, -csize, -csize,  1.0f, 1.0f,
+            csize, -csize,  csize,  1.0f, 0.0f,
+            csize, -csize,  csize,  1.0f, 0.0f,
+            -csize, -csize,  csize,  0.0f, 0.0f,
+            -csize, -csize, -csize,  0.0f, 1.0f,
 
-            -size,  size, -size,  0.0f, 1.0f,
-            size,  size, -size,  1.0f, 1.0f,
-            size,  size,  size,  1.0f, 0.0f,
-            size,  size,  size,  1.0f, 0.0f,
-            -size,  size,  size,  0.0f, 0.0f,
-            -size,  size, -size,  0.0f, 1.0f
+            -csize,  csize, -csize,  0.0f, 1.0f,
+            csize,  csize, -csize,  1.0f, 1.0f,
+            csize,  csize,  csize,  1.0f, 0.0f,
+            csize,  csize,  csize,  1.0f, 0.0f,
+            -csize,  csize,  csize,  0.0f, 0.0f,
+            -csize,  csize, -csize,  0.0f, 1.0f
         };
 
         return vertices;

@@ -25,6 +25,7 @@
 #include "Texture2D.h"
 #include "Camera.h"
 #include "shapes/Cube.h"
+#include "OpenSimplexNoise.h"
 
 const GLint WIDTH = 800, HEIGHT = 600;
 
@@ -42,10 +43,9 @@ float lastframe = 0.0f;
 glm::mat4 projection;
 
 // Configuration
-int nbrCubes = 100;
-int cubesPerRow = 10;
-int cubesPerCol = 10;
-
+int cubesPerRow = 20;
+int cubesPerCol = 20;
+int nbrCubes = 0;
 boost::filesystem::path find_executable()
 {
   unsigned int bufferSize = 512;
@@ -205,12 +205,12 @@ int main()
     glViewport(0, 0, w_width, w_height);
     glEnable(GL_DEPTH_TEST);
 
-    cam = Camera(glm::vec3(0.0f, 0.0f, 3.0f));
-
+    cam = Camera(glm::vec3(10.0f, 6.0f, 10.0f));
+    OpenSimplexNoise noise = OpenSimplexNoise();
     // SHADER PART
 
     Shader firstShader(find_executable().parent_path().append("../../src/shader/vertex/vertex.vs").string().c_str(), find_executable().parent_path().append("../../src/shader/fragment/fragment_texture.fs").string().c_str());
-    Texture2D sideDirt(find_executable().parent_path().append("../../res/textures/side_dirt.jpg").string().c_str());
+    Texture2D sideDirt(find_executable().parent_path().append("../../res/textures/top_dirt.png").string().c_str());
     Texture2D::SetParameter(GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
     Texture2D::SetParameter(GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     Texture2D topDirt(find_executable().parent_path().append("../../res/textures/top_dirt.png").string().c_str());
@@ -219,8 +219,18 @@ int main()
     
     std::vector<Cube> cubesVector;
     
-    for (int i = 0; i < nbrCubes; i++) {
-        cubesVector.push_back(Cube((float) (i % cubesPerRow), (float) floor(rand() % 3), (float) floor(i / cubesPerCol) * -1, 0.5f));
+    for (int i = 0; i < cubesPerRow * cubesPerCol; i++) {
+        nbrCubes++;
+        float x = (float) (i % cubesPerRow);
+        float z = (float) floor(i / cubesPerCol) * -1;
+        float y = floor((noise.Evaluate(x/6, z/6)+1)*2);
+        cubesVector.push_back(Cube(x, y, z, 0.5f));
+        while (0 != y)
+        {
+            nbrCubes++;
+            y -= 1;
+            cubesVector.push_back(Cube(x, y, z, 0.5f));
+        }
     }
 
     GLuint VBO, VAO;
@@ -231,7 +241,7 @@ int main()
     glBindVertexArray(VAO);
 
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(cubesVector[0].vertices) + (sizeof(GLfloat) * cubesVector[0].vertices.size()) , &cubesVector[0].vertices[0], GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(cubesVector[0].getVertices()) + (sizeof(GLfloat) * cubesVector[0].getVertices().size()) , &cubesVector[0].getVertices()[0], GL_STATIC_DRAW);
 
     glEnableVertexAttribArray(0);
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(GL_FLOAT), (void*)0);
@@ -266,8 +276,6 @@ int main()
         sideDirt.Bind(GL_TEXTURE0);
         topDirt.Bind(GL_TEXTURE1);
         const float radius = 15.0f;
-        float camX = sin(glfwGetTime()) * radius;
-        float camZ = cos(glfwGetTime()) * radius;
         glm::mat4 view = glm::mat4(1.0f);
         view = cam.GetViewMatrix();
         firstShader.setMatrix("view", glm::value_ptr(view));
