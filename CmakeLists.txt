@@ -12,9 +12,18 @@ add_executable(Prog1 src/prog1.cpp)
 target_include_directories(Prog1 PUBLIC "${CONAN_INCLUDE_DIRS}")
 target_link_libraries(Prog1 ${CONAN_LIBS})
 
+target_compile_features(Prog1 PUBLIC cxx_std_11)
+
 add_executable(Prog2 src/prog2.cpp)
 
 target_include_directories(Prog2 PUBLIC "${CONAN_INCLUDE_DIRS}")
 target_link_libraries(Prog2 ${CONAN_LIBS})
 
 target_compile_features(Prog2 PUBLIC cxx_std_11)
+
+add_executable(Prog3 src/prog3.cpp)
+
+target_include_directories(Prog3 PUBLIC "${CONAN_INCLUDE_DIRS}")
+target_link_libraries(Prog3 ${CONAN_LIBS})
+
+target_compile_features(Prog3 PUBLIC cxx_std_11)
