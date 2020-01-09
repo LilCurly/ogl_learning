@@ -147,6 +147,14 @@ void processInput(GLFWwindow* window)
     {
         cam.ProcessKeyboard(Camera_Movement::RIGHT, deltatime);
     }
+    if(glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS)
+    {
+        cam.ProcessKeyboard(Camera_Movement::UP, deltatime);
+    }
+    if(glfwGetKey(window, GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS)
+    {
+        cam.ProcessKeyboard(Camera_Movement::BOTTOM, deltatime);
+    }
 }
 
 int main()
