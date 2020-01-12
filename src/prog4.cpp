@@ -286,8 +286,13 @@ int main()
     objShader.setVec3("objColor", 1.0f, 0.5f, 0.31f);
     objShader.setVec3("lightColor", 1.0f, 1.0f, 1.0f);
 
+    glm::mat4 objModel = glm::mat4(1.0f);
+    objShader.setMatrix("model", glm::value_ptr(objModel));
+    objShader.setMatrix("modelNormal", glm::value_ptr(glm::transpose(glm::inverse(objModel))));
+
     while(!glfwWindowShouldClose(window))
     {
+        
         glfwPollEvents();
         processInput(window);
 
@@ -307,9 +312,6 @@ int main()
         objShader.setMatrix("view", glm::value_ptr(view));
         objShader.setMatrix("projection", glm::value_ptr(projection));
         objShader.setVec3("lightPos", lightPos);
-
-        glm::mat4 objModel = glm::mat4(1.0f);
-        objShader.setMatrix("model", glm::value_ptr(objModel));
 
         glBindVertexArray(objVAO);
         glDrawArrays(GL_TRIANGLES, 0, 36);
