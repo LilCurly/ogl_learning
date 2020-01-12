@@ -117,6 +117,16 @@ public:
 	{
 		glUniformMatrix4fv(glGetUniformLocation(this->Program, name.c_str()), 1, GL_FALSE, matrix);
 	}
+
+	void setVec3(const std::string& name, float x, float y, float z)
+	{
+		glUniform3f(glGetUniformLocation(this->Program, name.c_str()), x, y, z);
+	}
+
+	void setVec3(const std::string& name, glm::vec3 vector)
+	{
+		glUniform3f(glGetUniformLocation(this->Program, name.c_str()), vector.x, vector.y, vector.z);
+	}
 };
 
 #endif

@@ -27,3 +27,10 @@ target_include_directories(Prog3 PUBLIC "${CONAN_INCLUDE_DIRS}")
 target_link_libraries(Prog3 ${CONAN_LIBS})
 
 target_compile_features(Prog3 PUBLIC cxx_std_11)
+
+add_executable(Prog4 src/prog4.cpp)
+
+target_include_directories(Prog4 PUBLIC "${CONAN_INCLUDE_DIRS}")
+target_link_libraries(Prog4 ${CONAN_LIBS})
+
+target_compile_features(Prog4 PUBLIC cxx_std_11)
