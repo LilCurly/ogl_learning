@@ -312,6 +312,7 @@ int main()
         objShader.setMatrix("view", glm::value_ptr(view));
         objShader.setMatrix("projection", glm::value_ptr(projection));
         objShader.setVec3("lightPos", lightPos);
+        objShader.setVec3("viewPos", cam.Position);
 
         glBindVertexArray(objVAO);
         glDrawArrays(GL_TRIANGLES, 0, 36);
