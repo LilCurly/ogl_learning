@@ -284,12 +284,14 @@ int main()
 
     objShader.Use();
     objShader.setVec3("objColor", 1.0f, 1.0f, 0.31f);
-    objShader.setVec3("lightColor", 1.0f, 1.0f, 1.0f);
 
     objShader.setVec3("mat.ambient", 1.0f, 0.5f, 0.31f);
     objShader.setVec3("mat.diffusal", 1.0f, 0.5f, 0.31f);
     objShader.setVec3("mat.specular", 0.5f, 0.5f, 0.5f);
     objShader.setFloat("mat.shininess", 32.0f);
+
+    objShader.setVec3("light.ambient", 0.1f, 0.1f, 0.1f);
+    objShader.setVec3("light.specular", 0.9f, 0.9f, 0.9f);
 
     while(!glfwWindowShouldClose(window))
     {
@@ -304,6 +306,7 @@ int main()
         glClearColor(0.3f, 0.4f, 0.4f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+        glm::vec3 lightColor = glm::vec3(abs(sin(glfwGetTime())), abs(cos(glfwGetTime())), abs(sin(glfwGetTime())));
         glm::vec3 circle = glm::vec3(cos(glfwGetTime()), 0.0f, -sin(glfwGetTime()));
         glm::mat4 view = glm::mat4(1.0f);
         view = cam.GetViewMatrix();
@@ -313,13 +316,15 @@ int main()
         
         objShader.setMatrix("view", glm::value_ptr(view));
         objShader.setMatrix("projection", glm::value_ptr(projection));
+        
+        objShader.setVec3("light.diffuse", lightColor);
 
         glm::mat4 objModel = glm::mat4(1.0f);
         objModel = glm::rotate(objModel, (float) glm::radians(glfwGetTime()) * 15, glm::vec3(1.0f, 0.0f, 1.0f));
         objShader.setMatrix("model", glm::value_ptr(objModel));
         objShader.setMatrix("modelNormal", glm::value_ptr(glm::transpose(glm::inverse(objModel))));
 
-        objShader.setVec3("lightPos", lightPos * circle);
+        objShader.setVec3("light.position", lightPos * circle);
         objShader.setVec3("viewPos", cam.Position);
 
         glBindVertexArray(objVAO);
@@ -329,6 +334,7 @@ int main()
 
         lightShader.setMatrix("view", glm::value_ptr(view));
         lightShader.setMatrix("projection", glm::value_ptr(projection));
+        lightShader.setVec3("lightColor", lightColor);
 
         glm::mat4 lightModel = glm::mat4(1.0f);
         lightModel = glm::translate(lightModel, lightPos * circle);
