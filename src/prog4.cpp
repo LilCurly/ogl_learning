@@ -285,10 +285,10 @@ int main()
     objShader.Use();
     objShader.setVec3("objColor", 1.0f, 1.0f, 0.31f);
 
-    objShader.setVec3("mat.ambient", 1.0f, 0.5f, 0.31f);
-    objShader.setVec3("mat.diffusal", 1.0f, 0.5f, 0.31f);
-    objShader.setVec3("mat.specular", 0.5f, 0.5f, 0.5f);
-    objShader.setFloat("mat.shininess", 16.0f);
+    objShader.setVec3("mat.ambient", 0.7f, 0.5f, 0.31f);
+    objShader.setVec3("mat.diffusal", 0.5f, 0.5f, 0.5f);
+    objShader.setVec3("mat.specular", 0.3f, 0.3f, 0.3f);
+    objShader.setFloat("mat.shininess", 32.0f);
 
     objShader.setVec3("light.specular", 1.0f, 1.0f, 1.0f);
 
