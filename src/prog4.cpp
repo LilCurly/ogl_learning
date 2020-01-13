@@ -286,10 +286,6 @@ int main()
     objShader.setVec3("objColor", 1.0f, 0.5f, 0.31f);
     objShader.setVec3("lightColor", 1.0f, 1.0f, 1.0f);
 
-    glm::mat4 objModel = glm::mat4(1.0f);
-    objShader.setMatrix("model", glm::value_ptr(objModel));
-    objShader.setMatrix("modelNormal", glm::value_ptr(glm::transpose(glm::inverse(objModel))));
-
     while(!glfwWindowShouldClose(window))
     {
         
@@ -303,15 +299,22 @@ int main()
         glClearColor(0.3f, 0.4f, 0.4f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+        glm::vec3 circle = glm::vec3(cos(glfwGetTime()), 0.0f, -sin(glfwGetTime()));
         glm::mat4 view = glm::mat4(1.0f);
         view = cam.GetViewMatrix();
         projection = glm::perspective(glm::radians(cam.Zoom), (float) WIDTH/ (float) HEIGHT, 0.1f, 100.0f);
 
         objShader.Use();
-
+        
         objShader.setMatrix("view", glm::value_ptr(view));
         objShader.setMatrix("projection", glm::value_ptr(projection));
-        objShader.setVec3("lightPos", lightPos);
+
+        glm::mat4 objModel = glm::mat4(1.0f);
+        objModel = glm::rotate(objModel, (float) glm::radians(glfwGetTime()) * 15, glm::vec3(1.0f, 0.0f, 1.0f));
+        objShader.setMatrix("model", glm::value_ptr(objModel));
+        objShader.setMatrix("modelNormal", glm::value_ptr(glm::transpose(glm::inverse(objModel))));
+
+        objShader.setVec3("lightPos", lightPos * circle);
         objShader.setVec3("viewPos", cam.Position);
 
         glBindVertexArray(objVAO);
@@ -323,7 +326,7 @@ int main()
         lightShader.setMatrix("projection", glm::value_ptr(projection));
 
         glm::mat4 lightModel = glm::mat4(1.0f);
-        lightModel = glm::translate(lightModel, lightPos);
+        lightModel = glm::translate(lightModel, lightPos * circle);
         lightModel = glm::scale(lightModel, glm::vec3(0.2f));
         lightShader.setMatrix("model", glm::value_ptr(lightModel));
 
