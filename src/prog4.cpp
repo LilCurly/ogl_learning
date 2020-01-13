@@ -288,10 +288,9 @@ int main()
     objShader.setVec3("mat.ambient", 1.0f, 0.5f, 0.31f);
     objShader.setVec3("mat.diffusal", 1.0f, 0.5f, 0.31f);
     objShader.setVec3("mat.specular", 0.5f, 0.5f, 0.5f);
-    objShader.setFloat("mat.shininess", 32.0f);
+    objShader.setFloat("mat.shininess", 16.0f);
 
-    objShader.setVec3("light.ambient", 0.1f, 0.1f, 0.1f);
-    objShader.setVec3("light.specular", 0.9f, 0.9f, 0.9f);
+    objShader.setVec3("light.specular", 1.0f, 1.0f, 1.0f);
 
     while(!glfwWindowShouldClose(window))
     {
@@ -306,7 +305,7 @@ int main()
         glClearColor(0.3f, 0.4f, 0.4f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        glm::vec3 lightColor = glm::vec3(abs(sin(glfwGetTime())), abs(cos(glfwGetTime())), abs(sin(glfwGetTime())));
+        glm::vec3 lightColor = glm::vec3(abs(sin(glfwGetTime() * 2.0f)), abs(cos(glfwGetTime() * 0.7f)), abs(sin(glfwGetTime() * 1.3f)));
         glm::vec3 circle = glm::vec3(cos(glfwGetTime()), 0.0f, -sin(glfwGetTime()));
         glm::mat4 view = glm::mat4(1.0f);
         view = cam.GetViewMatrix();
@@ -317,7 +316,8 @@ int main()
         objShader.setMatrix("view", glm::value_ptr(view));
         objShader.setMatrix("projection", glm::value_ptr(projection));
         
-        objShader.setVec3("light.diffuse", lightColor);
+        objShader.setVec3("light.diffuse", lightColor * glm::vec3(0.5f));
+        objShader.setVec3("light.ambient", lightColor * glm::vec3(0.2f));
 
         glm::mat4 objModel = glm::mat4(1.0f);
         objModel = glm::rotate(objModel, (float) glm::radians(glfwGetTime()) * 15, glm::vec3(1.0f, 0.0f, 1.0f));
