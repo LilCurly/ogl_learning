@@ -283,8 +283,13 @@ int main()
     glBindBuffer(GL_ARRAY_BUFFER, 0);
 
     objShader.Use();
-    objShader.setVec3("objColor", 1.0f, 0.5f, 0.31f);
+    objShader.setVec3("objColor", 1.0f, 1.0f, 0.31f);
     objShader.setVec3("lightColor", 1.0f, 1.0f, 1.0f);
+
+    objShader.setVec3("mat.ambient", 1.0f, 0.5f, 0.31f);
+    objShader.setVec3("mat.diffusal", 1.0f, 0.5f, 0.31f);
+    objShader.setVec3("mat.specular", 0.5f, 0.5f, 0.5f);
+    objShader.setFloat("mat.shininess", 32.0f);
 
     while(!glfwWindowShouldClose(window))
     {
