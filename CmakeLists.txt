@@ -41,3 +41,10 @@ target_include_directories(Prog5 PUBLIC "${CONAN_INCLUDE_DIRS}")
 target_link_libraries(Prog5 ${CONAN_LIBS})
 
 target_compile_features(Prog5 PUBLIC cxx_std_11)
+
+add_executable(Prog6 src/prog6.cpp)
+
+target_include_directories(Prog6 PUBLIC "${CONAN_INCLUDE_DIRS}")
+target_link_libraries(Prog6 ${CONAN_LIBS})
+
+target_compile_features(Prog6 PUBLIC cxx_std_11)
