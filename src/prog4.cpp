@@ -282,13 +282,14 @@ int main()
     glBindVertexArray(0);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
 
+    glm::vec3 objColor = glm::vec3(0.9f, 0.5f, 0.1f);
     objShader.Use();
-    objShader.setVec3("objColor", 1.0f, 1.0f, 0.31f);
+    objShader.setVec3("objColor", objColor);
 
-    objShader.setVec3("mat.ambient", 0.7f, 0.5f, 0.31f);
-    objShader.setVec3("mat.diffusal", 0.5f, 0.5f, 0.5f);
-    objShader.setVec3("mat.specular", 0.3f, 0.3f, 0.3f);
-    objShader.setFloat("mat.shininess", 32.0f);
+    objShader.setVec3("mat.ambient", objColor * glm::vec3(0.9f));
+    objShader.setVec3("mat.diffusal", objColor * glm::vec3(0.8f));
+    objShader.setVec3("mat.specular", 1.0f, 1.0f, 1.0f);
+    objShader.setFloat("mat.shininess", 24.0f);
 
     objShader.setVec3("light.specular", 1.0f, 1.0f, 1.0f);
 
@@ -316,7 +317,7 @@ int main()
         objShader.setMatrix("view", glm::value_ptr(view));
         objShader.setMatrix("projection", glm::value_ptr(projection));
         
-        objShader.setVec3("light.diffuse", lightColor * glm::vec3(0.5f));
+        objShader.setVec3("light.diffuse", lightColor * glm::vec3(0.7f));
         objShader.setVec3("light.ambient", lightColor * glm::vec3(0.2f));
 
         glm::mat4 objModel = glm::mat4(1.0f);
