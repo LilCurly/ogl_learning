@@ -40,9 +40,6 @@ float lastframe = 0.0f;
 // Projection
 glm::mat4 projection;
 
-// Light Postion
-glm::vec3 lightPos = glm::vec3(3.0f, 0.0f, -3.0f);
-
 boost::filesystem::path find_executable()
 {
   unsigned int bufferSize = 512;
@@ -207,7 +204,6 @@ int main()
     // SHADER PART
 
     Shader objShader(find_executable().parent_path().append("../../src/shader/vertex/prog5.vertex.vs").string().c_str(), find_executable().parent_path().append("../../src/shader/fragment/prog6.fragment.fs").string().c_str());
-    Shader lightShader(find_executable().parent_path().append("../../src/shader/vertex/prog4.vertex.vs").string().c_str(), find_executable().parent_path().append("../../src/shader/fragment/prog4.lightsource.fs").string().c_str());
     
     // Texture loading
 
@@ -259,6 +255,19 @@ int main()
         -0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,  0.0f, 1.0f
     };
 
+    glm::vec3 cubePositions[] = {
+        glm::vec3( 0.0f,  0.0f,  0.0f),
+        glm::vec3( 2.0f,  5.0f, -15.0f),
+        glm::vec3(-1.5f, -2.2f, -2.5f),
+        glm::vec3(-3.8f, -2.0f, -12.3f),
+        glm::vec3( 2.4f, -0.4f, -3.5f),
+        glm::vec3(-1.7f,  3.0f, -7.5f),
+        glm::vec3( 1.3f, -2.0f, -2.5f),
+        glm::vec3( 1.5f,  2.0f, -2.5f),
+        glm::vec3( 1.5f,  0.2f, -1.5f),
+        glm::vec3(-1.3f,  1.0f, -1.5f)
+    };
+
     GLuint VBO, objVAO;
 
     glGenBuffers(1, &VBO);
@@ -301,10 +310,14 @@ int main()
     objShader.setVec3("mat.specular", 1.0f, 1.0f, 1.0f);
     objShader.setFloat("mat.shininess", 32.0f);
 
-    objShader.setVec3("light.direction", lightPos);
     objShader.setVec3("light.specular", 1.0f, 1.0f, 1.0f);
     objShader.setVec3("light.diffuse", lightColor * glm::vec3(0.8f));
     objShader.setVec3("light.ambient", lightColor * glm::vec3(0.2f));
+    objShader.setFloat("light.constant", 1.0f);
+    objShader.setFloat("light.linear", 0.09f);
+    objShader.setFloat("light.quadratic", 0.032f);
+    objShader.setFloat("light.innerAngle", glm::cos(glm::radians(12.5f)));
+    objShader.setFloat("light.outerAngle", glm::cos(glm::radians(17.5f)));
 
     objShader.setInt("mat.diffusal", 0);
     objShader.setInt("mat.specular", 1);
@@ -334,32 +347,23 @@ int main()
 
         objShader.Use();
         
+
+        objShader.setVec3("light.position", cam.Position);
+        objShader.setVec3("light.direction", cam.Front);
+
         objShader.setMatrix("view", glm::value_ptr(view));
         objShader.setMatrix("projection", glm::value_ptr(projection));
-        
-        glm::mat4 objModel = glm::mat4(1.0f);
-        objModel = glm::rotate(objModel, (float) glm::radians(glfwGetTime()) * 15, glm::vec3(1.0f, 0.0f, 1.0f));
-        objShader.setMatrix("model", glm::value_ptr(objModel));
-        objShader.setMatrix("modelNormal", glm::value_ptr(glm::transpose(glm::inverse(objModel))));
-
         objShader.setVec3("viewPos", cam.Position);
-
-        glBindVertexArray(objVAO);
-        glDrawArrays(GL_TRIANGLES, 0, 36);
         
-        lightShader.Use();
-
-        lightShader.setMatrix("view", glm::value_ptr(view));
-        lightShader.setMatrix("projection", glm::value_ptr(projection));
-        lightShader.setVec3("lightColor", lightColor);
-
-        glm::mat4 lightModel = glm::mat4(1.0f);
-        lightModel = glm::translate(lightModel, lightPos);
-        lightModel = glm::scale(lightModel, glm::vec3(0.2f));
-        lightShader.setMatrix("model", glm::value_ptr(lightModel));
-
-        glBindVertexArray(lightVAO);
-        glDrawArrays(GL_TRIANGLES, 0, 36);
+        glBindVertexArray(objVAO);
+        for (int i = 0; i < 10; i++) {
+            glm::mat4 objModel = glm::mat4(1.0f);
+            objModel = glm::translate(objModel, cubePositions[i]);
+            objModel = glm::rotate(objModel, (float) glm::radians(glfwGetTime()) * 15, glm::vec3(1.0f, 0.0f, 1.0f));
+            objShader.setMatrix("model", glm::value_ptr(objModel));
+            objShader.setMatrix("modelNormal", glm::value_ptr(glm::transpose(glm::inverse(objModel))));
+            glDrawArrays(GL_TRIANGLES, 0, 36);
+        }
 
         glfwSwapBuffers(window);
     }
